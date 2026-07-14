@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaStock - Controle de Medicamentos</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Ícones externos para uma interface profissional -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse logo-icon"></i>
+            <span>Pharma<strong class="brand-accent">Stock</strong></span>
+        </div>
+        <div class="system-status">
+            <span id="date-display"></span>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Seção de Filtros e Ações Baseada no Layout da Imagem -->
+        <div class="control-bar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Pesquisar por nome ou tag...">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="openModal('modal-fornecedor')">
+                    <i class="fa-solid fa-truck"></i> + FORNECEDOR
+                </button>
+                <button class="btn btn-primary" onclick="openModal('modal-produto')">
+                    <i class="fa-solid fa-prescription-bottle-medical"></i> ADICIONAR PRODUTO
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabela Principal de Estoque -->
+        <div class="table-wrapper">
+            <table class="stock-table">
+                <thead>
+                    <tr>
+                        <th width="15%">TAG</th>
+                        <th width="25%">NOME</th>
+                        <th width="20%">FORNECEDOR</th>
+                        <th width="12%">QUANTIDADE</th>
+                        <th width="13%">VALIDADE</th>
+                        <th width="15%">AÇÕES / MOVIMENTAÇÃO</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-tbody">
+                    <!-- Gerado dinamicamente via JS -->
+                    <tr>
+                        <td colspan="6" class="table-loading">Carregando estoque...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL: Novo Fornecedor -->
+    <div id="modal-fornecedor" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Cadastrar Novo Fornecedor</h3>
+                <button class="close-btn" onclick="closeModal('modal-fornecedor')">&times;</button>
+            </div>
+            <form id="form-fornecedor">
+                <div class="form-group">
+                    <label for="forn-nome">Nome do Fornecedor / Distribuidora</label>
+                    <input type="text" id="forn-nome" required placeholder="Ex: MedFarma Distribuidora">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-muted" onclick="closeModal('modal-fornecedor')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Novo Produto -->
+    <div id="modal-produto" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Cadastrar Novo Produto / Insumo</h3>
+                <button class="close-btn" onclick="closeModal('modal-produto')">&times;</button>
+            </div>
+            <form id="form-produto">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="prod-tag">Tag Identificadora</label>
+                        <input type="text" id="prod-tag" required placeholder="Ex: MED-302">
+                    </div>
+                    <div class="form-group col">
+                        <label for="prod-nome">Nome do Medicamento</label>
+                        <input type="text" id="prod-nome" required placeholder="Ex: Dipirona Sódica">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="prod-fornecedor">Fornecedor</label>
+                    <select id="prod-fornecedor" required>
+                        <option value="">Selecione um fornecedor...</option>
+                        <!-- Populado dinamicamente -->
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="prod-qtd">Quantidade Inicial</label>
+                        <input type="number" id="prod-qtd" min="0" value="0" required>
+                    </div>
+                    <div class="form-group col">
+                        <label for="prod-validade">Data de Validade</label>
+                        <input type="date" id="prod-validade" required>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-muted" onclick="closeModal('modal-produto')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cadastrar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Movimentação de Entrada / Saída -->
+    <div id="modal-movimentacao" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Movimentar Estoque</h3>
+                <button class="close-btn" onclick="closeModal('modal-movimentacao')">&times;</button>
+            </div>
+            <form id="form-movimentacao">
+                <input type="hidden" id="mov-prod-id">
+                <div class="form-group">
+                    <label>Medicamento</label>
+                    <input type="text" id="mov-prod-nome" readonly class="input-readonly">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="mov-tipo">Tipo de Operação</label>
+                        <select id="mov-tipo" required>
+                            <option value="entrada">Entrada (+)</option>
+                            <option value="saida">Saída (-)</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="mov-qtd">Quantidade</label>
+                        <input type="number" id="mov-qtd" min="1" required placeholder="Ex: 50">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-muted" onclick="closeModal('modal-movimentacao')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar Movimentação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
