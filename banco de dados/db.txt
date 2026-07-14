@@ -1,0 +1,35 @@
+CREATE DATABASE IF NOT EXISTS pharmastock CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE pharmastock;
+
+-- 1. Tabela de Fornecedores
+CREATE TABLE IF NOT EXISTS fornecedores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- 2. Tabela de Produtos/Medicamentos
+CREATE TABLE IF NOT EXISTS produtos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tag VARCHAR(20) NOT NULL UNIQUE,
+    nome VARCHAR(100) NOT NULL,
+    fornecedor_id INT,
+    quantidade INT DEFAULT 0,
+    validade DATE NOT NULL,
+    FOREIGN KEY (fornecedor_id) REFERENCES fornecedores(id) ON DELETE SET NULL
+);
+
+-- 3. Inserindo Fornecedores Iniciais para Teste
+INSERT IGNORE INTO fornecedores (id, nome) VALUES 
+(1, 'MedFarma Distribuidora'),
+(2, 'BioSaúde Insumos'),
+(3, 'EuroFarma S.A.'),
+(4, 'Cirúrgica Express'),
+(5, 'Anahuac Medicamentos');
+
+-- 4. Inserindo Produtos Iniciais para Teste
+INSERT IGNORE INTO produtos (tag, nome, fornecedor_id, quantidade, validade) VALUES
+('MED-091', 'Amoxicilina 500mg', 1, 450, '2027-11-12'),
+('MED-042', 'Dipirona Sódica 500mg/ml', 2, 120, '2026-09-15'),
+('MED-115', 'Paracetamol 750mg', 3, 12, '2026-08-01'),
+('INS-008', 'Seringas Descartáveis 5ml', 4, 1200, '2029-03-30'),
+('MED-224', 'Insulina Glargina 100UI/ml', 5, 0, '2026-07-05');
